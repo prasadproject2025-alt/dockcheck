@@ -1,0 +1,30 @@
+services:
+  # Development services
+  postgres:
+    image: ghcr.io/serverpod/postgres:16
+    ports:
+      - "8090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: dockcheck
+      POSTGRES_PASSWORD: "hGlheSzDyhWVH6B2wTp-LSNWUWVa8_3o"
+    volumes:
+      - dockcheck_data:/var/lib/postgresql/data
+
+
+  # Test services
+  postgres_test:
+    image: ghcr.io/serverpod/postgres:16
+    ports:
+      - "9090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: dockcheck_test
+      POSTGRES_PASSWORD: "tDI7NfuFwG3uEhnJWqFpq1Rv9hB1gY0M"
+    volumes:
+      - dockcheck_test_data:/var/lib/postgresql/data
+
+
+volumes:
+  dockcheck_data:
+  dockcheck_test_data:
