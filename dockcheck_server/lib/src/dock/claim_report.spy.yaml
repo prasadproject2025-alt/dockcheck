@@ -1,0 +1,8 @@
+### Evidence pack the supervisor sends to the transport company.
+class: ClaimReport
+fields:
+  shipment: Shipment
+  discrepancies: List<Discrepancy>
+  photoUrls: List<String>
+  reportText: String
+  generatedAt: DateTime

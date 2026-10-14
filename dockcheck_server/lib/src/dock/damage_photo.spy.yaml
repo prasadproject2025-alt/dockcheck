@@ -1,0 +1,9 @@
+### Photo evidence of damage, stored in Serverpod file storage.
+class: DamagePhoto
+table: damage_photo
+fields:
+  item: ShipmentItem?, relation(name=item_photos, onDelete=Cascade)
+  storagePath: String
+  takenAt: DateTime, default=now
+  ### Public download URL, filled in on read (not stored).
+  url: String?, !persist

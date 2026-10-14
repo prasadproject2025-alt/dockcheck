@@ -1,0 +1,8 @@
+### What the worker submits (possibly long after it was recorded offline).
+class: Receipt
+fields:
+  ### Client-generated id. Making the call idempotent lets the queue retry safely.
+  receiptId: String
+  shipmentId: int
+  recordedAt: DateTime
+  lines: List<ReceiptLine>

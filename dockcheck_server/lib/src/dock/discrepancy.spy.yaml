@@ -1,0 +1,15 @@
+### A mismatch found by the server when comparing expected and received.
+class: Discrepancy
+table: discrepancy
+fields:
+  shipmentId: int, relation(parent=shipment, onDelete=Cascade)
+  itemDescription: String
+  kind: DiscrepancyKind
+  quantity: int
+  ### 0-100, computed on the server.
+  severity: int
+  explanation: String
+  createdAt: DateTime, default=now
+indexes:
+  discrepancy_shipment_idx:
+    fields: shipmentId

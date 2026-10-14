@@ -1,0 +1,5 @@
+### Which role a signed-in user plays on the dock.
+enum: StaffRoleType
+values:
+  - worker
+  - supervisor

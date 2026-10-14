@@ -1,0 +1,11 @@
+### Maps an authenticated user to their dock role.
+class: StaffProfile
+table: staff_profile
+fields:
+  authUserId: UuidValue
+  role: StaffRoleType
+  displayName: String
+indexes:
+  staff_profile_user_idx:
+    fields: authUserId
+    unique: true

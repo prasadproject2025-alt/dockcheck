@@ -1,0 +1,4 @@
+### Business-rule failures that the client can show to the user.
+exception: DockException
+fields:
+  message: String

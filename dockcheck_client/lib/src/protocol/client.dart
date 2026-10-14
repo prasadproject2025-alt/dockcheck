@@ -11,8 +11,20 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
-import 'package:dockcheck_client/src/protocol/greetings/greeting.dart'
-    as _i4tiygzt;
+import 'package:dockcheck_client/src/protocol/dock/claim_report.dart'
+    as _iqdau6zs;
+import 'package:dockcheck_client/src/protocol/dock/discrepancy.dart'
+    as _iuqcwwxd;
+import 'package:dockcheck_client/src/protocol/dock/dock_alert.dart'
+    as _ijkcww34;
+import 'package:dockcheck_client/src/protocol/dock/new_shipment.dart'
+    as _i3y50uhm;
+import 'package:dockcheck_client/src/protocol/dock/receipt.dart' as _ixapc2gt;
+import 'package:dockcheck_client/src/protocol/dock/shipment.dart' as _ikb66t34;
+import 'package:dockcheck_client/src/protocol/dock/staff_profile.dart'
+    as _ijf29keu;
+import 'package:dockcheck_client/src/protocol/dock/staff_role.dart'
+    as _ic6kvd76;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -246,22 +258,133 @@ class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
       );
 }
 
-/// This is an example endpoint that returns a greeting message through
-/// its [hello] method.
+/// Supervisor notifications: a stored history plus a live stream.
 /// {@category Endpoint}
-class EndpointGreeting extends _isc.EndpointRef {
-  EndpointGreeting(_isc.EndpointCaller caller) : super(caller);
+class EndpointAlert extends _isc.EndpointRef {
+  EndpointAlert(_isc.EndpointCaller caller) : super(caller);
 
   @override
-  String get name => 'greeting';
+  String get name => 'alert';
 
-  /// Returns a personalized greeting message: "Hello {name}".
-  _ida.Future<_i4tiygzt.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i4tiygzt.Greeting>(
-        'greeting',
-        'hello',
-        {'name': name},
+  /// Most recent alerts first.
+  _ida.Future<List<_ijkcww34.DockAlert>> listAlerts() =>
+      caller.callServerEndpoint<List<_ijkcww34.DockAlert>>(
+        'alert',
+        'listAlerts',
+        {},
       );
+
+  /// Marks every unread alert as read.
+  _ida.Future<void> markAllRead() => caller.callServerEndpoint<void>(
+    'alert',
+    'markAllRead',
+    {},
+  );
+
+  /// Pushes new alerts to the supervisor the moment the server raises them.
+  _ida.Stream<_ijkcww34.DockAlert> liveAlerts() =>
+      caller.callStreamingServerEndpoint<
+        _ida.Stream<_ijkcww34.DockAlert>,
+        _ijkcww34.DockAlert
+      >(
+        'alert',
+        'liveAlerts',
+        {},
+        {},
+      );
+}
+
+/// Expected shipments, receiving at the dock, discrepancies and claims.
+/// {@category Endpoint}
+class EndpointShipment extends _isc.EndpointRef {
+  EndpointShipment(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'shipment';
+
+  /// Supervisor registers an expected delivery.
+  _ida.Future<_ikb66t34.Shipment> createShipment(_i3y50uhm.NewShipment input) =>
+      caller.callServerEndpoint<_ikb66t34.Shipment>(
+        'shipment',
+        'createShipment',
+        {'input': input},
+      );
+
+  /// All shipments, newest first.
+  _ida.Future<List<_ikb66t34.Shipment>> listShipments() =>
+      caller.callServerEndpoint<List<_ikb66t34.Shipment>>(
+        'shipment',
+        'listShipments',
+        {},
+      );
+
+  /// One shipment with items and photos.
+  _ida.Future<_ikb66t34.Shipment?> getShipment(int shipmentId) =>
+      caller.callServerEndpoint<_ikb66t34.Shipment?>(
+        'shipment',
+        'getShipment',
+        {'shipmentId': shipmentId},
+      );
+
+  /// Discrepancies the server found for a shipment, worst first.
+  _ida.Future<List<_iuqcwwxd.Discrepancy>> listDiscrepancies(int shipmentId) =>
+      caller.callServerEndpoint<List<_iuqcwwxd.Discrepancy>>(
+        'shipment',
+        'listDiscrepancies',
+        {'shipmentId': shipmentId},
+      );
+
+  /// Records what arrived. Safe to retry: a repeated [Receipt.receiptId]
+  /// returns the stored result instead of duplicating it, which is what lets
+  /// the app queue receipts offline and sync them later.
+  _ida.Future<_ikb66t34.Shipment> submitReceipt(_ixapc2gt.Receipt receipt) =>
+      caller.callServerEndpoint<_ikb66t34.Shipment>(
+        'shipment',
+        'submitReceipt',
+        {'receipt': receipt},
+      );
+
+  /// Builds the evidence pack for the carrier and marks the claim as filed.
+  _ida.Future<_iqdau6zs.ClaimReport> generateClaimReport(int shipmentId) =>
+      caller.callServerEndpoint<_iqdau6zs.ClaimReport>(
+        'shipment',
+        'generateClaimReport',
+        {'shipmentId': shipmentId},
+      );
+}
+
+/// Role selection after sign-up. Dock workers register freely; supervisors
+/// need the invite code the warehouse manager shares with them.
+/// {@category Endpoint}
+class EndpointStaff extends _isc.EndpointRef {
+  EndpointStaff(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'staff';
+
+  /// The caller's profile, or null if they have not chosen a role yet.
+  _ida.Future<_ijf29keu.StaffProfile?> myProfile() =>
+      caller.callServerEndpoint<_ijf29keu.StaffProfile?>(
+        'staff',
+        'myProfile',
+        {},
+      );
+
+  /// Creates the caller's profile. Idempotent: returns the existing profile if
+  /// one exists.
+  _ida.Future<_ijf29keu.StaffProfile> register({
+    required String displayName,
+    required _ic6kvd76.StaffRoleType role,
+    String? inviteCode,
+  }) => caller.callServerEndpoint<_ijf29keu.StaffProfile>(
+    'staff',
+    'register',
+    {
+      'displayName': displayName,
+      'role': role,
+      'inviteCode': inviteCode,
+    },
+  );
 }
 
 class Modules {
@@ -304,7 +427,9 @@ class Client extends _isc.ServerpodClientShared {
        ) {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
-    greeting = EndpointGreeting(this);
+    alert = EndpointAlert(this);
+    shipment = EndpointShipment(this);
+    staff = EndpointStaff(this);
     modules = Modules(this);
   }
 
@@ -312,7 +437,11 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointJwtRefresh jwtRefresh;
 
-  late final EndpointGreeting greeting;
+  late final EndpointAlert alert;
+
+  late final EndpointShipment shipment;
+
+  late final EndpointStaff staff;
 
   late final Modules modules;
 
@@ -320,7 +449,9 @@ class Client extends _isc.ServerpodClientShared {
   Map<String, _isc.EndpointRef> get endpointRefLookup => {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
-    'greeting': greeting,
+    'alert': alert,
+    'shipment': shipment,
+    'staff': staff,
   };
 
   @override

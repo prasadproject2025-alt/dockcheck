@@ -47,4 +47,24 @@ If the user asks you to test the app:
 
 The app is launched from `dockcheck_flutter/lib/driver.dart`, which starts the Flutter driver extension with text entry emulation turned off so the app stays usable by hand. To let the driver type, set `enableTextEntryEmulation: true` there and `hot_restart` the app.
 
-IMPORTANT: After building the first version of the app, update this AGENTS.md file with information about the app we're building. KEEP the info about the MCP server and the checklist. Remove this paragraph.
+## About the app: DockCheck
+
+DockCheck lets warehouse dock workers check an inbound delivery against what was expected, even with no signal, and gets supervisors the evidence to claim damage and shortages from the transport company.
+
+Two roles, stored in `StaffProfile` (not auth scopes). Workers register freely; supervisors need the invite code (`supervisorInviteCode` in `config/passwords.yaml`, default `DOCK-SUPERVISOR` for demos).
+
+Server (`dockcheck_server/lib/src/dock/`):
+- Models (`*.spy.yaml`): `Shipment` -> `ShipmentItem` -> `DamagePhoto`, `Discrepancy`, `DockAlert`, `StaffProfile`, plus transfer types `NewShipment`, `Receipt`, `ReceiptLine`, `ClaimReport` and `DockException`.
+- `analysis.dart`: pure functions that compare expected and received quantities and score each mismatch 0-100. Unit tested in `test/unit/analysis_test.dart`.
+- `shipment_endpoint.dart`: create shipment (supervisor), `submitReceipt` (idempotent on `Receipt.receiptId`, locks the shipment row in a transaction, stores photos in `public` file storage, writes discrepancies, raises an alert), claim report generation.
+- `alert_endpoint.dart`: stored alerts plus the `liveAlerts` stream, fed by `session.messages` on the `dock-alerts` channel.
+- `deadline_scan_future_call.dart`: recurring future calls scheduled in `server.dart` (hourly claim-deadline reminders, daily per-carrier summary).
+- `dock_access.dart`: role checks and `raiseAlert`.
+
+Flutter (`dockcheck_flutter/lib/`):
+- `state/dock_store.dart`: single `store`. Worker receipts are saved to the phone first (shared_preferences, photos as base64) and synced in order, retrying every 10 s. Shipments and profile are cached so the app opens offline. The "Offline" switch in the banner simulates no signal for demos.
+- `screens/`: `staff_gate` (role picker), `worker_shell`, `receive_screen`, `supervisor_shell` (shipments + live alerts), `create_shipment_screen`, `shipment_detail_screen` (findings, photos, claim report).
+
+Known limits: Serverpod 4's experimental offline sync is not used, the offline queue is our own. Photo uploads go through the endpoint (max 6 MB each, request limit 20 MB).
+
+Integration tests in `test/integration/dock_flow_test.dart` cover the full flow. On the author's Windows machine the embedded test database failed to start under `dart test` (the harness and the server both try to start it), so run them where that works or against `serverpod start`.

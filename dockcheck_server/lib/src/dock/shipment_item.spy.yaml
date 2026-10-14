@@ -1,0 +1,11 @@
+### One expected line on a shipment, plus what the worker actually counted.
+class: ShipmentItem
+table: shipment_item
+fields:
+  shipment: Shipment?, relation(name=shipment_items, onDelete=Cascade)
+  description: String
+  expectedQty: int
+  receivedQty: int?
+  damagedQty: int, default=0
+  note: String?
+  photos: List<DamagePhoto>?, relation(name=item_photos)

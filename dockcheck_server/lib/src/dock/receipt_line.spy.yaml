@@ -1,0 +1,8 @@
+### Counted quantities for a single shipment item.
+class: ReceiptLine
+fields:
+  shipmentItemId: int
+  receivedQty: int
+  damagedQty: int
+  note: String?
+  photos: List<ByteData>

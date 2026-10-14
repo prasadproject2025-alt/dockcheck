@@ -1,0 +1,15 @@
+### Notification for supervisors. Persisted so offline supervisors still see it,
+### and pushed live over a stream.
+class: DockAlert
+table: dock_alert
+fields:
+  shipmentId: int
+  kind: String
+  title: String
+  message: String
+  severity: int
+  createdAt: DateTime, default=now
+  readAt: DateTime?
+indexes:
+  dock_alert_created_idx:
+    fields: createdAt

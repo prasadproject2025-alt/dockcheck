@@ -1,0 +1,7 @@
+### Lifecycle of an inbound shipment.
+enum: ShipmentStatus
+values:
+  - expected
+  - clean
+  - discrepancy
+  - claimFiled

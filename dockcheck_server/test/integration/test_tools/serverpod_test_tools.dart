@@ -13,8 +13,21 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
 import 'dart:io' as _idi;
-import 'package:dockcheck_server/src/generated/greetings/greeting.dart'
-    as _ihmzo1zy;
+import 'package:dockcheck_server/src/generated/dock/claim_report.dart'
+    as _i75f2wrm;
+import 'package:dockcheck_server/src/generated/dock/discrepancy.dart'
+    as _i8557xl8;
+import 'package:dockcheck_server/src/generated/dock/dock_alert.dart'
+    as _iy7rtp0n;
+import 'package:dockcheck_server/src/generated/dock/new_shipment.dart'
+    as _iq4rigk1;
+import 'package:dockcheck_server/src/generated/dock/receipt.dart' as _inkl84vp;
+import 'package:dockcheck_server/src/generated/dock/shipment.dart' as _irgwkjh2;
+import 'package:dockcheck_server/src/generated/dock/staff_profile.dart'
+    as _ijelgis2;
+import 'package:dockcheck_server/src/generated/dock/staff_role.dart'
+    as _iuf6jdfb;
+import 'package:dockcheck_server/src/generated/future_calls.dart' as _il4z7wjz;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -152,11 +165,17 @@ void withServerpod(
 }
 
 class TestEndpoints {
+  late final futureCalls = _FutureCalls();
+
   late final _EmailIdpEndpoint emailIdp;
 
   late final _JwtRefreshEndpoint jwtRefresh;
 
-  late final _GreetingEndpoint greeting;
+  late final _AlertEndpoint alert;
+
+  late final _ShipmentEndpoint shipment;
+
+  late final _StaffEndpoint staff;
 }
 
 class _InternalTestEndpoints extends TestEndpoints
@@ -174,11 +193,23 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
-    greeting = _GreetingEndpoint(
+    alert = _AlertEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    shipment = _ShipmentEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    staff = _StaffEndpoint(
       endpoints,
       serializationManager,
     );
   }
+}
+
+class _FutureCalls {
+  late final deadlineScan = _DeadlineScanFutureCall();
 }
 
 class _EmailIdpEndpoint {
@@ -499,8 +530,8 @@ class _JwtRefreshEndpoint {
   }
 }
 
-class _GreetingEndpoint {
-  _GreetingEndpoint(
+class _AlertEndpoint {
+  _AlertEndpoint(
     this._endpointDispatch,
     this._serializationManager,
   );
@@ -509,22 +540,21 @@ class _GreetingEndpoint {
 
   final _is.SerializationManager _serializationManager;
 
-  _ida.Future<_ihmzo1zy.Greeting> hello(
+  _ida.Future<List<_iy7rtp0n.DockAlert>> listAlerts(
     _ist.TestSessionBuilder sessionBuilder,
-    String name,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'greeting',
-            method: 'hello',
+            endpoint: 'alert',
+            method: 'listAlerts',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'greeting',
-          methodName: 'hello',
-          parameters: _ist.testObjectToJson({'name': name}),
+          endpointPath: 'alert',
+          methodName: 'listAlerts',
+          parameters: _ist.testObjectToJson({}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -532,11 +562,372 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<_ihmzo1zy.Greeting>);
+                as _ida.Future<List<_iy7rtp0n.DockAlert>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
       }
     });
+  }
+
+  _ida.Future<void> markAllRead(_ist.TestSessionBuilder sessionBuilder) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'alert',
+            method: 'markAllRead',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'alert',
+          methodName: 'markAllRead',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Stream<_iy7rtp0n.DockAlert> liveAlerts(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) {
+    var _localTestStreamManager = _ist.TestStreamManager<_iy7rtp0n.DockAlert>();
+    _ist.callStreamFunctionAndHandleExceptions(
+      () async {
+        var _localUniqueSession =
+            (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+              endpoint: 'alert',
+              method: 'liveAlerts',
+            );
+        var _localCallContext = await _endpointDispatch
+            .getMethodStreamCallContext(
+              createSessionCallback: (_) => _localUniqueSession,
+              endpointPath: 'alert',
+              methodName: 'liveAlerts',
+              arguments: {},
+              requestedInputStreams: [],
+              serializationManager: _serializationManager,
+            );
+        await _localTestStreamManager.callStreamMethod(
+          _localCallContext,
+          _localUniqueSession,
+          {},
+        );
+      },
+      _localTestStreamManager.outputStreamController,
+    );
+    return _localTestStreamManager.outputStreamController.stream;
+  }
+}
+
+class _ShipmentEndpoint {
+  _ShipmentEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_irgwkjh2.Shipment> createShipment(
+    _ist.TestSessionBuilder sessionBuilder,
+    _iq4rigk1.NewShipment input,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'shipment',
+            method: 'createShipment',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'shipment',
+          methodName: 'createShipment',
+          parameters: _ist.testObjectToJson({'input': input}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_irgwkjh2.Shipment>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_irgwkjh2.Shipment>> listShipments(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'shipment',
+            method: 'listShipments',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'shipment',
+          methodName: 'listShipments',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_irgwkjh2.Shipment>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_irgwkjh2.Shipment?> getShipment(
+    _ist.TestSessionBuilder sessionBuilder,
+    int shipmentId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'shipment',
+            method: 'getShipment',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'shipment',
+          methodName: 'getShipment',
+          parameters: _ist.testObjectToJson({'shipmentId': shipmentId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_irgwkjh2.Shipment?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_i8557xl8.Discrepancy>> listDiscrepancies(
+    _ist.TestSessionBuilder sessionBuilder,
+    int shipmentId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'shipment',
+            method: 'listDiscrepancies',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'shipment',
+          methodName: 'listDiscrepancies',
+          parameters: _ist.testObjectToJson({'shipmentId': shipmentId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_i8557xl8.Discrepancy>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_irgwkjh2.Shipment> submitReceipt(
+    _ist.TestSessionBuilder sessionBuilder,
+    _inkl84vp.Receipt receipt,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'shipment',
+            method: 'submitReceipt',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'shipment',
+          methodName: 'submitReceipt',
+          parameters: _ist.testObjectToJson({'receipt': receipt}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_irgwkjh2.Shipment>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_i75f2wrm.ClaimReport> generateClaimReport(
+    _ist.TestSessionBuilder sessionBuilder,
+    int shipmentId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'shipment',
+            method: 'generateClaimReport',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'shipment',
+          methodName: 'generateClaimReport',
+          parameters: _ist.testObjectToJson({'shipmentId': shipmentId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_i75f2wrm.ClaimReport>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _StaffEndpoint {
+  _StaffEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_ijelgis2.StaffProfile?> myProfile(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'staff',
+            method: 'myProfile',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'staff',
+          methodName: 'myProfile',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ijelgis2.StaffProfile?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_ijelgis2.StaffProfile> register(
+    _ist.TestSessionBuilder sessionBuilder, {
+    required String displayName,
+    required _iuf6jdfb.StaffRoleType role,
+    String? inviteCode,
+  }) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'staff',
+            method: 'register',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'staff',
+          methodName: 'register',
+          parameters: _ist.testObjectToJson({
+            'displayName': displayName,
+            'role': role,
+            'inviteCode': inviteCode,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ijelgis2.StaffProfile>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _DeadlineScanFutureCall {
+  Future<void> scanDeadlines(_ist.TestSessionBuilder sessionBuilder) async {
+    var _localUniqueSession =
+        (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild();
+    try {
+      await _il4z7wjz.DeadlineScanScanDeadlinesFutureCall().invoke(
+        _localUniqueSession,
+        null,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
+  }
+
+  Future<void> dailySummary(_ist.TestSessionBuilder sessionBuilder) async {
+    var _localUniqueSession =
+        (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild();
+    try {
+      await _il4z7wjz.DeadlineScanDailySummaryFutureCall().invoke(
+        _localUniqueSession,
+        null,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
   }
 }

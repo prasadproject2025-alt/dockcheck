@@ -1,0 +1,6 @@
+### What went wrong with a line item.
+enum: DiscrepancyKind
+values:
+  - short
+  - damaged
+  - over

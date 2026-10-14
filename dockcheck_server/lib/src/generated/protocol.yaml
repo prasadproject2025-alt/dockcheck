@@ -9,5 +9,17 @@ emailIdp:
   - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
-greeting:
-  - hello:
+alert:
+  - listAlerts:
+  - markAllRead:
+  - liveAlerts:
+shipment:
+  - createShipment:
+  - listShipments:
+  - getShipment:
+  - listDiscrepancies:
+  - submitReceipt:
+  - generateClaimReport:
+staff:
+  - myProfile:
+  - register:

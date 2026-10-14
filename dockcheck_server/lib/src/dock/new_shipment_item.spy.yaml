@@ -1,0 +1,5 @@
+### One expected line in a [NewShipment].
+class: NewShipmentItem
+fields:
+  description: String
+  expectedQty: int

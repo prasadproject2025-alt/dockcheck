@@ -102,4 +102,21 @@ void run(List<String> args) async {
 
   // Start the server.
   await pod.start();
+
+  // Recurring jobs. Cancel first so a restart never stacks duplicate schedules.
+  await pod.futureCalls.cancel(_deadlineScanId);
+  await pod.futureCalls.cancel(_dailySummaryId);
+  await pod.futureCalls
+      .callRecurring(identifier: _deadlineScanId)
+      .every(const Duration(hours: 1))
+      .deadlineScan
+      .scanDeadlines();
+  await pod.futureCalls
+      .callRecurring(identifier: _dailySummaryId)
+      .cron('0 6 * * *')
+      .deadlineScan
+      .dailySummary();
 }
+
+const _deadlineScanId = 'dock-deadline-scan';
+const _dailySummaryId = 'dock-daily-summary';

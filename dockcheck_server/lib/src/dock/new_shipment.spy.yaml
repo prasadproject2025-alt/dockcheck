@@ -1,0 +1,8 @@
+### Supervisor input for creating an expected shipment.
+class: NewShipment
+fields:
+  reference: String
+  carrier: String
+  ### Hours after arrival during which the carrier accepts damage claims.
+  claimWindowHours: int
+  items: List<NewShipmentItem>

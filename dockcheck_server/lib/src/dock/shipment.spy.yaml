@@ -1,0 +1,19 @@
+### An inbound delivery the supervisor expects at the dock.
+class: Shipment
+table: shipment
+fields:
+  reference: String
+  carrier: String
+  status: ShipmentStatus, default=expected
+  createdAt: DateTime, default=now
+  ### Transporters only accept damage claims until this moment.
+  claimDeadline: DateTime
+  createdByUserId: UuidValue
+  receivedAt: DateTime?
+  receivedByName: String?
+  ### Id of the receipt that was accepted, used to ignore duplicate syncs.
+  receiptId: String?
+  items: List<ShipmentItem>?, relation(name=shipment_items)
+indexes:
+  shipment_status_idx:
+    fields: status
