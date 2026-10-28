@@ -62,3 +62,8 @@ cd dockcheck_flutter && flutter test
 
 - Serverpod 4's experimental offline sync is not used. The offline queue is written for this app (local storage plus an idempotent receipt id), which keeps the behaviour predictable.
 - The risk scoring is a simple, explainable formula (share of the line affected, plus a penalty for damage without photos), not machine learning.
+
+
+
+
+hi
